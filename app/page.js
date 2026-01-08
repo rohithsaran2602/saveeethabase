@@ -664,6 +664,13 @@ export default function SaveethaBase() {
       formData.append('timestamp', signData.timestamp);
       formData.append('signature', signData.signature);
       formData.append('folder', 'saveethabase');
+      formData.append('resource_type', 'raw'); // Explicitly set resource type
+      formData.append('type', 'upload'); // Ensure public upload type
+      // IMPORTANT: The upload_preset in Cloudinary console may override these settings
+      // If files are still blocked, you need to update the preset in Cloudinary console:
+      // 1. Go to Settings > Upload > Upload presets
+      // 2. Edit 'saveethabase' preset
+      // 3. Set "Access mode" to "Public" or remove access restrictions
       formData.append('upload_preset', 'saveethabase');
 
       const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloudName}/auto/upload`, {
@@ -673,6 +680,22 @@ export default function SaveethaBase() {
       const uploadData = await uploadRes.json();
 
       if (!uploadRes.ok) throw new Error(uploadData.error?.message || 'Cloudinary upload failed');
+
+      // 2.5. Unblock the asset immediately after upload (in case preset blocked it)
+      try {
+        await fetch('/api/files/unblock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            publicId: uploadData.public_id,
+            resourceType: 'raw'
+          })
+        });
+        console.log('Asset unblocked after upload');
+      } catch (unblockError) {
+        console.warn('Failed to unblock asset after upload (non-critical):', unblockError);
+        // Continue anyway - download route will try to unblock on demand
+      }
 
       // 2. Save Metadata to Supabase (using snake_case for DB)
       const fileData = {
