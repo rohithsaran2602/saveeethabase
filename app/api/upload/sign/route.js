@@ -7,7 +7,6 @@ export async function POST(request) {
         const paramsToSign = {
             timestamp,
             folder: 'saveethabase',
-            resource_type: 'raw',
             type: 'upload', // Ensure public upload type
             // Note: If upload_preset has access restrictions, they will override these
             // You may need to update the preset in Cloudinary console or remove it

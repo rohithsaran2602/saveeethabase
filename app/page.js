@@ -554,7 +554,7 @@ export default function SaveethaBase() {
 
       // Fallback to proxy if direct fetch fails
       showToast('Preparing download via secure proxy...');
-      
+
       // Validate URL before sending to proxy
       try {
         new URL(selectedFile.file_url);
@@ -565,7 +565,7 @@ export default function SaveethaBase() {
       }
 
       const proxyUrl = `/api/download?url=${encodeURIComponent(selectedFile.file_url)}&filename=${encodeURIComponent(filename)}`;
-      
+
       // Redirect to proxy (which will handle the actual download or return an error)
       // Note: If proxy returns an error JSON, it will be shown in browser console
       // The proxy now has proper error handling and will redirect safely
@@ -664,7 +664,6 @@ export default function SaveethaBase() {
       formData.append('timestamp', signData.timestamp);
       formData.append('signature', signData.signature);
       formData.append('folder', 'saveethabase');
-      formData.append('resource_type', 'raw'); // Explicitly set resource type
       formData.append('type', 'upload'); // Ensure public upload type
       // IMPORTANT: The upload_preset in Cloudinary console may override these settings
       // If files are still blocked, you need to update the preset in Cloudinary console:
@@ -688,7 +687,7 @@ export default function SaveethaBase() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             publicId: uploadData.public_id,
-            resourceType: 'raw'
+            resourceType: uploadData.resource_type
           })
         });
         console.log('Asset unblocked after upload');
