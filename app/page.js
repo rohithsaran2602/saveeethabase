@@ -510,46 +510,71 @@ export default function SaveethaBase() {
   };
 
   const handleActualDownload = async () => {
-    if (!selectedFile || !selectedFile.file_url) return;
+    if (!selectedFile || !selectedFile.file_url) {
+      showToast('No file selected for download', 'error');
+      return;
+    }
 
     let filename = selectedFile.title || 'download';
     if (selectedFile.file_type && !filename.endsWith(`.${selectedFile.file_type}`)) {
       filename += `.${selectedFile.file_type}`;
     }
 
-    showToast('Starting high-speed download...');
+    showToast('Starting download...');
 
     try {
-      // THE REAL SOLUTION: Fetch as Blob to bypass browser preview engines and Vercel limits
-      const response = await fetch(selectedFile.file_url);
+      // First, try direct fetch (works for CORS-enabled URLs)
+      try {
+        const response = await fetch(selectedFile.file_url, {
+          method: 'GET',
+          mode: 'cors',
+        });
 
-      if (!response.ok) {
-        // Fallback to proxy if direct fetch fails (CORS)
-        window.location.href = `/api/download?url=${encodeURIComponent(selectedFile.file_url)}&filename=${encodeURIComponent(filename)}`;
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', filename);
+          document.body.appendChild(link);
+          link.click();
+
+          // Cleanup
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+
+          showToast('Download complete!');
+          setTimeout(() => setShowAdWall(false), 1500);
+          return;
+        }
+      } catch (directError) {
+        console.log('Direct fetch failed (likely CORS), using proxy:', directError.message);
+      }
+
+      // Fallback to proxy if direct fetch fails
+      showToast('Preparing download via secure proxy...');
+      
+      // Validate URL before sending to proxy
+      try {
+        new URL(selectedFile.file_url);
+      } catch (urlError) {
+        showToast('Invalid file URL. Please contact support.', 'error');
+        console.error('Invalid URL:', selectedFile.file_url);
         return;
       }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      showToast('Download complete!');
-      setTimeout(() => setShowAdWall(false), 1500);
+      const proxyUrl = `/api/download?url=${encodeURIComponent(selectedFile.file_url)}&filename=${encodeURIComponent(filename)}`;
+      
+      // Redirect to proxy (which will handle the actual download or return an error)
+      // Note: If proxy returns an error JSON, it will be shown in browser console
+      // The proxy now has proper error handling and will redirect safely
+      window.location.href = proxyUrl;
 
     } catch (error) {
-      console.warn('Direct fetch failed, using proxy fallback:', error);
-      // Final fallback to the proxy
-      window.location.href = `/api/download?url=${encodeURIComponent(selectedFile.file_url)}&filename=${encodeURIComponent(filename)}`;
-      setTimeout(() => setShowAdWall(false), 2000);
+      console.error('Download error:', error);
+      showToast('Download failed. Please check the file URL and try again.', 'error');
+      setTimeout(() => setShowAdWall(false), 3000);
     }
   };
 
