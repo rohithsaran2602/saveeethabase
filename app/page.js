@@ -510,7 +510,7 @@ export default function SaveethaBase() {
   };
 
   const handleActualDownload = async () => {
-    if (!selectedFile || !selectedFile.file_url) {
+    if (!selectedFile || (!selectedFile.file_url && !selectedFile.download_url)) {
       showToast('No file selected for download', 'error');
       return;
     }
@@ -520,60 +520,39 @@ export default function SaveethaBase() {
       filename += `.${selectedFile.file_type}`;
     }
 
-    showToast('Starting download...');
+    showToast('Preparing your download...');
 
     try {
-      // First, try direct fetch (works for CORS-enabled URLs)
+      // Use download_url if available, otherwise fall back to file_url
+      const fileUrl = selectedFile.download_url || selectedFile.file_url;
+
+      // Validate URL
       try {
-        const response = await fetch(selectedFile.file_url, {
-          method: 'GET',
-          mode: 'cors',
-        });
-
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', filename);
-          document.body.appendChild(link);
-          link.click();
-
-          // Cleanup
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-
-          showToast('Download complete!');
-          setTimeout(() => setShowAdWall(false), 1500);
-          return;
-        }
-      } catch (directError) {
-        console.log('Direct fetch failed (likely CORS), using proxy:', directError.message);
-      }
-
-      // Fallback to proxy if direct fetch fails
-      showToast('Preparing download via secure proxy...');
-
-      // Validate URL before sending to proxy
-      try {
-        new URL(selectedFile.file_url);
+        new URL(fileUrl);
       } catch (urlError) {
         showToast('Invalid file URL. Please contact support.', 'error');
-        console.error('Invalid URL:', selectedFile.file_url);
+        console.error('Invalid URL:', fileUrl);
         return;
       }
 
-      const proxyUrl = `/api/download?url=${encodeURIComponent(selectedFile.file_url)}&filename=${encodeURIComponent(filename)}`;
+      // Always use proxy for reliable downloads with proper authentication
+      const proxyUrl = `/api/download?url=${encodeURIComponent(fileUrl)}&filename=${encodeURIComponent(filename)}`;
 
-      // Redirect to proxy (which will handle the actual download or return an error)
-      // Note: If proxy returns an error JSON, it will be shown in browser console
-      // The proxy now has proper error handling and will redirect safely
+      console.log('[Download] Initiating download via proxy for:', filename);
+
+      // Use window.location to trigger download
+      // The server will handle streaming and proper headers
       window.location.href = proxyUrl;
+
+      // Close modal after a short delay
+      setTimeout(() => {
+        showToast('Download started!');
+        setShowAdWall(false);
+      }, 1000);
 
     } catch (error) {
       console.error('Download error:', error);
-      showToast('Download failed. Please check the file URL and try again.', 'error');
+      showToast('Download failed. Please try again or contact support.', 'error');
       setTimeout(() => setShowAdWall(false), 3000);
     }
   };
@@ -652,41 +631,17 @@ export default function SaveethaBase() {
 
     setUploading(true);
     try {
-      // 1. Get Cloud Configuration from backend
-      const configRes = await fetch('/api/upload/sign', { method: 'POST' });
-      const configData = await configRes.json();
-      if (!configRes.ok) throw new Error(configData.error || 'Failed to get upload configuration');
-
-      // 2. Upload to Cloudinary (Unsigned)
+      // 1. Upload to our SERVER-SIDE API (bypasses all client-side Cloudinary blocks)
       const formData = new FormData();
       formData.append('file', uploadForm.file);
-      formData.append('upload_preset', 'saveethabase');
-      // Note: In Unsigned mode, 'folder' should be set in the Cloudinary Preset UI, 
-      // not sent via form data, unless specifically allowed.
 
-      const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${configData.cloudName}/auto/upload`, {
+      const uploadRes = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });
       const uploadData = await uploadRes.json();
 
-      if (!uploadRes.ok) throw new Error(uploadData.error?.message || 'Cloudinary upload failed');
-
-      // 2.5. Unblock the asset immediately after upload (in case preset blocked it)
-      try {
-        await fetch('/api/files/unblock', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            publicId: uploadData.public_id,
-            resourceType: uploadData.resource_type
-          })
-        });
-        console.log('Asset unblocked after upload');
-      } catch (unblockError) {
-        console.warn('Failed to unblock asset after upload (non-critical):', unblockError);
-        // Continue anyway - download route will try to unblock on demand
-      }
+      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
 
       // 2. Save Metadata to Supabase (using snake_case for DB)
       const fileData = {
@@ -701,6 +656,7 @@ export default function SaveethaBase() {
         file_url: uploadData.secure_url,
         cloudinary_public_id: uploadData.public_id,
         file_type: uploadForm.file.name.split('.').pop(),
+        download_url: uploadData.download_url || uploadData.secure_url, // Use authenticated download URL
         requestId: uploadForm.requestId // Pass requestId if it exists (for fulfillment)
       };
 
