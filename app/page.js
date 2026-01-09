@@ -819,59 +819,59 @@ export default function SaveethaBase() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      <main className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-10">
         {/* Hero Section */}
-        <div className="mb-12 animate-fadeIn">
-          <div className="text-center mb-8">
-            <h2 className="text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
+        <div className="mb-8 md:mb-12 animate-fadeIn">
+          <div className="text-center mb-6 md:mb-8">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2 md:mb-4 tracking-tight">
               Welcome back, <span className="text-gradient">{user ? user.name.split(' ')[0] : 'Student'}</span>! 👋
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
               Discover <span className="font-bold text-gradient-blue">premium study resources</span> shared by seniors and toppers.
               Accelerate your academic journey today.
             </p>
           </div>
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-slate-200/60 text-center hover:shadow-lg transition-all card-hover">
-              <div className="text-3xl font-bold text-gradient">{files.length}</div>
-              <div className="text-sm text-slate-600 font-medium">Resources</div>
+          <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-3xl mx-auto mb-6 md:mb-8">
+            <div className="bg-white/80 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200/60 text-center hover:shadow-lg transition-all card-hover">
+              <div className="text-xl md:text-3xl font-bold text-gradient">{files.length}</div>
+              <div className="text-xs md:text-sm text-slate-600 font-medium">Resources</div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-slate-200/60 text-center hover:shadow-lg transition-all card-hover">
-              <div className="text-3xl font-bold text-gradient-blue">{requests.length}</div>
-              <div className="text-sm text-slate-600 font-medium">Active Requests</div>
+            <div className="bg-white/80 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200/60 text-center hover:shadow-lg transition-all card-hover">
+              <div className="text-xl md:text-3xl font-bold text-gradient-blue">{requests.length}</div>
+              <div className="text-xs md:text-sm text-slate-600 font-medium">Active Requests</div>
             </div>
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-slate-200/60 text-center hover:shadow-lg transition-all card-hover">
-              <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{user?.uploads_count || 0}</div>
-              <div className="text-sm text-slate-600 font-medium">Your Uploads</div>
+            <div className="bg-white/80 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-200/60 text-center hover:shadow-lg transition-all card-hover">
+              <div className="text-xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{user?.uploads_count || 0}</div>
+              <div className="text-xs md:text-sm text-slate-600 font-medium">Your Uploads</div>
             </div>
           </div>
 
           {/* Search and Action Bar */}
-          <div className="flex gap-4 max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
             <div className="relative flex-1 group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors z-10" size={22} />
+              <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors z-10" size={20} />
               <input
                 type="text"
-                placeholder="Search for subjects, codes, topics, or materials..."
-                className="w-full pl-14 pr-6 py-5 bg-white/90 backdrop-blur-sm border-2 border-slate-200 rounded-2xl shadow-md focus:shadow-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all text-lg font-medium placeholder:text-slate-400"
+                placeholder="Search resources..."
+                className="w-full pl-12 md:pl-14 pr-4 md:pr-6 py-3 md:py-5 bg-white/90 backdrop-blur-sm border-2 border-slate-200 rounded-xl md:rounded-2xl shadow-md focus:shadow-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all text-base md:text-lg font-medium placeholder:text-slate-400"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
             <button
               onClick={() => setShowUploadModal(true)}
-              className="btn-gradient text-white px-10 py-5 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-3 whitespace-nowrap"
+              className="btn-gradient text-white px-6 md:px-10 py-3 md:py-5 rounded-xl md:rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 whitespace-nowrap"
             >
-              <Upload size={22} />
+              <Upload size={20} />
               Upload Resource
             </button>
           </div>
         </div>
 
         {/* Header Banner Ad - High Visibility */}
-        <div className="mb-8 animate-fadeIn">
+        <div className="mb-8 animate-fadeIn hidden md:block">
           <div className="bg-white/60 backdrop-blur-sm p-4 rounded-2xl border border-slate-200/60 max-w-4xl mx-auto">
             <div className="text-xs text-slate-400 text-center mb-2 font-medium">Advertisement</div>
             <div className="flex justify-center">
@@ -883,32 +883,32 @@ export default function SaveethaBase() {
           </div>
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
           {/* Sidebar Filters */}
-          <div className="w-72 flex-shrink-0 space-y-6 animate-slideIn">
-            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-3xl shadow-md border border-slate-200/60">
-              <h3 className="font-bold mb-5 flex items-center gap-2 text-slate-800 text-lg">
+          <div className="w-full lg:w-72 flex-shrink-0 space-y-4 md:space-y-6 animate-slideIn order-first">
+            <div className="bg-white/80 backdrop-blur-sm p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-slate-200/60">
+              <h3 className="font-bold mb-4 md:mb-5 flex items-center gap-2 text-slate-800 text-lg">
                 <Filter size={20} className="text-blue-600" />
                 Filters
               </h3>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Category</label>
-                  <select className="w-full p-3 bg-white border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer hover:border-slate-300" onChange={e => setFilters({ ...filters, category: e.target.value })}>
+              <div className="grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4">
+                <div className="space-y-1.5 md:space-y-2 col-span-2 md:col-span-1">
+                  <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Category</label>
+                  <select className="w-full p-2.5 md:p-3 bg-white border-2 border-slate-200 rounded-lg md:rounded-xl text-sm md:text-base text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer hover:border-slate-300" onChange={e => setFilters({ ...filters, category: e.target.value })}>
                     <option value="all">All Categories</option>
                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Department</label>
-                  <select className="w-full p-3 bg-white border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer hover:border-slate-300" onChange={e => setFilters({ ...filters, department: e.target.value })}>
+                <div className="space-y-1.5 md:space-y-2">
+                  <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Department</label>
+                  <select className="w-full p-2.5 md:p-3 bg-white border-2 border-slate-200 rounded-lg md:rounded-xl text-sm md:text-base text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer hover:border-slate-300" onChange={e => setFilters({ ...filters, department: e.target.value })}>
                     <option value="all">All Departments</option>
                     {departments.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Year</label>
-                  <select className="w-full p-3 bg-white border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer hover:border-slate-300" onChange={e => setFilters({ ...filters, year: e.target.value })}>
+                <div className="space-y-1.5 md:space-y-2">
+                  <label className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Year</label>
+                  <select className="w-full p-2.5 md:p-3 bg-white border-2 border-slate-200 rounded-lg md:rounded-xl text-sm md:text-base text-slate-700 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer hover:border-slate-300" onChange={e => setFilters({ ...filters, year: e.target.value })}>
                     <option value="all">All Years</option>
                     {years.map(c => <option key={c} value={c}>Year {c}</option>)}
                   </select>
@@ -917,7 +917,7 @@ export default function SaveethaBase() {
             </div>
 
             {/* AdSense Unit - Sidebar */}
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-3xl shadow-md border border-slate-200/60">
+            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl md:rounded-3xl shadow-md border border-slate-200/60 hidden lg:block">
               <div className="text-xs text-slate-400 text-center mb-2 font-medium">Advertisement</div>
               <AdSenseUnit
                 slot="YOUR_SIDEBAR_AD_SLOT"
@@ -1127,6 +1127,21 @@ export default function SaveethaBase() {
 
       </main>
 
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 mt-12 py-8 pb-32">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-600 mb-4">
+            <a href="/about" className="hover:text-blue-600 transition">About</a>
+            <a href="/contact" className="hover:text-blue-600 transition">Contact</a>
+            <a href="/privacy" className="hover:text-blue-600 transition">Privacy Policy</a>
+            <a href="/terms" className="hover:text-blue-600 transition">Terms of Service</a>
+          </div>
+          <div className="text-center text-xs text-slate-500">
+            © 2026 SaveethaBase. All rights reserved.
+          </div>
+        </div>
+      </footer>
+
       {/* Sticky Footer Banner - Continuous Visibility */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-t border-slate-200/60 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-2">
@@ -1138,21 +1153,6 @@ export default function SaveethaBase() {
             />
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="bg-white border-t border-slate-200 mt-12 py-8">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-600 mb-4">
-              <a href="/about" className="hover:text-blue-600 transition">About</a>
-              <a href="/contact" className="hover:text-blue-600 transition">Contact</a>
-              <a href="/privacy" className="hover:text-blue-600 transition">Privacy Policy</a>
-              <a href="/terms" className="hover:text-blue-600 transition">Terms of Service</a>
-            </div>
-            <div className="text-center text-xs text-slate-500">
-              © 2026 SaveethaBase. All rights reserved.
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   );
