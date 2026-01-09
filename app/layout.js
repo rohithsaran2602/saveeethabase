@@ -10,13 +10,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-          ></script>
-        )}
+        {/* Google AdSense Verification Code */}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6181398572220661"
+          crossOrigin="anonymous"></script>
       </head>
       <body>{children}</body>
     </html>
