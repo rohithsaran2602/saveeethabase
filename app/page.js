@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Upload, Bell, Heart, Share2, FileText, BookOpen, ThumbsUp, Download, Filter, X, Plus, Loader2, CheckCircle, AlertCircle, LogOut, Trophy, Clock, Sparkles, MessageSquare, Award } from 'lucide-react';
 import { createClient } from '@/lib/supabase';
+import { uploadToSupabase } from '@/lib/supabase-storage';
 import NotificationCenter from '@/components/NotificationCenter';
 import ReviewsModal from '@/components/ReviewsModal';
 import AchievementModal from '@/components/AchievementModal';
@@ -101,7 +102,7 @@ const DownloadModal = ({ show, onClose, onDownload, processing, countdown, statu
   );
 };
 
-const UploadModal = ({ show, onClose, form, setForm, onSubmit, uploading, onFileChange }) => {
+const UploadModal = ({ show, onClose, form, setForm, onSubmit, uploading, uploadProgress = 0, onFileChange }) => {
   if (!show) return null;
   const categories = ['PYQ', 'CIA Paper', 'Study Material', 'Lab Record', 'Project File'];
   const departments = ['CSE', 'ECE', 'MECH', 'CIVIL', 'EEE', 'IT'];
@@ -165,18 +166,40 @@ const UploadModal = ({ show, onClose, form, setForm, onSubmit, uploading, onFile
             <label htmlFor="file-upload" className="cursor-pointer">
               <Upload className="mx-auto text-blue-600 mb-3" size={48} />
               <p className="text-base text-gray-700 font-semibold mb-1">{form.file ? form.file.name : 'Click to upload'}</p>
-              <p className="text-[10px] text-orange-600 mt-2 font-medium">⚠️ Max 10MB (Cloudinary limit). Large files may have download issues.</p>
+              <p className="text-xs text-gray-500 mt-2">Supports PDF and DOCX files (Max 10MB)</p>
+              <p className="text-[10px] text-blue-600 mt-1 font-medium">✨ Uploads directly to Cloudinary (no Vercel limit!)</p>
             </label>
           </div>
 
+          {/* Upload Progress Bar */}
+          {uploading && uploadProgress > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="flex justify-between text-sm text-blue-700 mb-2 font-medium">
+                <span>Uploading to Cloudinary...</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 h-full transition-all duration-300 ease-out rounded-full"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-4 pt-4">
-            <button onClick={onClose} className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-semibold">Cancel</button>
+            <button onClick={onClose} disabled={uploading} className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-semibold disabled:opacity-50">Cancel</button>
             <button
               onClick={onSubmit}
               disabled={uploading}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold flex justify-center items-center gap-2"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold flex justify-center items-center gap-2 disabled:opacity-50"
             >
-              {uploading ? <Loader2 className="animate-spin" /> : 'Publish Resource'}
+              {uploading ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  {uploadProgress > 0 && uploadProgress < 100 ? 'Uploading...' : 'Saving...'}
+                </>
+              ) : 'Publish Resource'}
             </button>
           </div>
         </div>
@@ -297,6 +320,7 @@ export default function SaveethaBase() {
   const [statusMessage, setStatusMessage] = useState('');
   const [toast, setToast] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0); // NEW: Upload progress tracking
 
   // New Feature States
   const [showNotifications, setShowNotifications] = useState(false);
@@ -619,31 +643,35 @@ export default function SaveethaBase() {
     setUploadForm({ ...uploadForm, file });
   };
 
-  const handleUploadSubmit = async () => {
+  const handleUpload = async () => {
     if (!user) {
       showToast('Please sign in to upload', 'error');
       return;
     }
-    if (!uploadForm.file || !uploadForm.title || !uploadForm.subjectCode) {
+    if (!uploadForm.title || !uploadForm.subjectName || !uploadForm.file) {
       showToast('Please fill all required fields', 'error');
       return;
     }
 
     setUploading(true);
+    setUploadProgress(0); // Reset progress
+
     try {
-      // 1. Upload to our SERVER-SIDE API (bypasses all client-side Cloudinary blocks)
-      const formData = new FormData();
-      formData.append('file', uploadForm.file);
+      // 1. Upload to Supabase Storage (no more Cloudinary blocking!)
+      console.log('[Upload] Starting upload to Supabase Storage...');
 
-      const uploadRes = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
+      const uploadData = await uploadToSupabase(uploadForm.file, {
+        user,
+        onProgress: (progress) => {
+          setUploadProgress(progress);
+          console.log(`[Upload] Progress: ${progress}%`);
+        }
       });
-      const uploadData = await uploadRes.json();
 
-      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
+      console.log('[Upload] Supabase upload successful!');
+      console.log('[Upload] Public URL:', uploadData.publicUrl);
 
-      // 2. Save Metadata to Supabase (using snake_case for DB)
+      // 2. Save metadata to database
       const fileData = {
         title: uploadForm.title,
         subject_name: uploadForm.subjectName,
@@ -653,12 +681,14 @@ export default function SaveethaBase() {
         department: uploadForm.department,
         year: parseInt(uploadForm.year),
         semester: parseInt(uploadForm.semester),
-        file_url: uploadData.secure_url,
-        cloudinary_public_id: uploadData.public_id,
+        file_url: uploadData.publicUrl,
+        storage_path: uploadData.path, // Store path for deletion later
         file_type: uploadForm.file.name.split('.').pop(),
-        download_url: uploadData.download_url || uploadData.secure_url, // Use authenticated download URL
-        requestId: uploadForm.requestId // Pass requestId if it exists (for fulfillment)
+        download_url: uploadData.publicUrl, // Direct download, no proxy needed!
+        requestId: uploadForm.requestId
       };
+
+      console.log('[Upload] Saving metadata to database...');
 
       const dbRes = await fetch('/api/files', {
         method: 'POST',
@@ -666,21 +696,31 @@ export default function SaveethaBase() {
         body: JSON.stringify(fileData)
       });
 
-      if (!dbRes.ok) throw new Error('Database save failed');
+      if (!dbRes.ok) {
+        const errorData = await dbRes.json();
+        throw new Error(errorData.error || 'Database save failed');
+      }
 
+      // Success!
       showToast('Resource published successfully! +50 points');
       setShowUploadModal(false);
       setUploadForm({
         title: '', subjectName: '', subjectCode: '', faculty: '',
         category: '', department: '', year: '', semester: '', file: null, requestId: null
       });
-      fetchFiles(); // Refresh list
-      fetchProfile(user.id); // Refresh points
-      fetchRequests(); // Refresh requests (to hide fulfilled ones)
+      setUploadProgress(0);
+
+      // Refresh data
+      fetchFiles();
+      fetchProfile(user.id);
+      fetchRequests();
+
     } catch (error) {
-      showToast(error.message, 'error');
+      console.error('[Upload] Error:', error);
+      showToast(error.message || 'Upload failed', 'error');
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -1075,7 +1115,7 @@ export default function SaveethaBase() {
         {/* Modal Portals */}
 
         {/* Modal Portals */}
-        {showUploadModal && <UploadModal show={showUploadModal} onClose={() => setShowUploadModal(false)} form={uploadForm} setForm={setUploadForm} onSubmit={handleUploadSubmit} uploading={uploading} onFileChange={handleFileChange} />}
+        {showUploadModal && <UploadModal show={showUploadModal} onClose={() => setShowUploadModal(false)} form={uploadForm} setForm={setUploadForm} onSubmit={handleUpload} uploading={uploading} uploadProgress={uploadProgress} onFileChange={handleFileChange} />}
         {showProfileModal && <ProfileModal show={showProfileModal} onClose={() => setShowProfileModal(false)} user={user} onSignOut={signOut} />}
         {showRequestForm && <RequestModal show={showRequestForm} onClose={() => setShowRequestForm(false)} form={requestForm} setForm={setRequestForm} onSubmit={handleRequestSubmit} />}
 
