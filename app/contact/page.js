@@ -1,131 +1,161 @@
-'use client'
+import Link from 'next/link';
+import { Mail, MessageSquare, Clock, MapPin } from 'lucide-react';
 
-import { useState } from 'react'
+export const metadata = {
+    title: 'Contact Us - SaveethaBase',
+    description: 'Get in touch with the SaveethaBase team. Report issues, request features, or send us feedback about our academic resource platform.',
+};
 
 export default function Contact() {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-    })
-    const [submitted, setSubmitted] = useState(false)
-
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        // For now, just show success message
-        // In production, you'd send this to an API endpoint
-        setSubmitted(true)
-        setTimeout(() => {
-            setSubmitted(false)
-            setFormData({ name: '', email: '', subject: '', message: '' })
-        }, 3000)
-    }
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4">
-            <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-                    <h1 className="text-4xl font-bold text-slate-800 mb-6">Contact Us</h1>
-                    <p className="text-slate-600 mb-8">Have a question, suggestion, or need help? We're here for you!</p>
+        <div className="min-h-screen bg-slate-50">
+            <nav className="sticky top-0 z-50 glass border-b border-white/20 shadow-lg">
+                <div className="max-w-4xl mx-auto px-6 h-16 flex items-center">
+                    <Link href="/" className="text-xl font-bold text-gradient hover:opacity-80 transition-opacity">
+                        ← SaveethaBase
+                    </Link>
+                </div>
+            </nav>
 
-                    <div className="grid md:grid-cols-2 gap-8 mb-8">
-                        <div>
-                            <h2 className="text-xl font-bold text-slate-800 mb-4">Get in Touch</h2>
-                            <div className="space-y-4">
-                                <div>
-                                    <h3 className="font-semibold text-slate-700">Email</h3>
-                                    <p className="text-slate-600">codez.ai.contact@gmail.com</p>
+            <main className="max-w-4xl mx-auto px-6 py-12">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-extrabold text-slate-900 mb-4">Contact Us</h1>
+                    <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+                        Have questions, feedback, or need help? We&apos;d love to hear from you.
+                    </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                    {/* Contact Info */}
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
+                            <h2 className="text-xl font-bold text-slate-800 mb-6">Get in Touch</h2>
+
+                            <div className="space-y-5">
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-blue-50 p-3 rounded-xl">
+                                        <Mail className="text-blue-600" size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800">Email</h3>
+                                        <a href="mailto:codez.ai.contact@gmail.com" className="text-blue-600 hover:underline">
+                                            codez.ai.contact@gmail.com
+                                        </a>
+                                        <p className="text-sm text-slate-500 mt-1">For general inquiries and support</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="font-semibold text-slate-700">Support</h3>
-                                    <p className="text-slate-600">codez.ai.contact@gmail.com</p>
+
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-purple-50 p-3 rounded-xl">
+                                        <MessageSquare className="text-purple-600" size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800">Feedback & Suggestions</h3>
+                                        <p className="text-slate-600 text-sm">
+                                            We&apos;re always looking to improve. Share your ideas for new features,
+                                            report bugs, or suggest improvements to make SaveethaBase better.
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="font-semibold text-slate-700">Business Inquiries</h3>
-                                    <p className="text-slate-600">codez.ai.contact@gmail.com</p>
+
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-green-50 p-3 rounded-xl">
+                                        <Clock className="text-green-600" size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800">Response Time</h3>
+                                        <p className="text-slate-600 text-sm">
+                                            We typically respond within 24–48 hours during weekdays.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-4">
+                                    <div className="bg-orange-50 p-3 rounded-xl">
+                                        <MapPin className="text-orange-600" size={22} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-slate-800">Location</h3>
+                                        <p className="text-slate-600 text-sm">
+                                            Saveetha Engineering College<br />
+                                            Thandalam, Chennai - 602105<br />
+                                            Tamil Nadu, India
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div>
-                            <h2 className="text-xl font-bold text-slate-800 mb-4">Quick Links</h2>
-                            <div className="space-y-2">
-                                <a href="/privacy" className="block text-blue-600 hover:text-blue-700">Privacy Policy</a>
-                                <a href="/terms" className="block text-blue-600 hover:text-blue-700">Terms of Service</a>
-                                <a href="/about" className="block text-blue-600 hover:text-blue-700">About Us</a>
+                    {/* FAQ / Common Topics */}
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
+                            <h2 className="text-xl font-bold text-slate-800 mb-6">Frequently Asked Questions</h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <h3 className="font-semibold text-slate-800 mb-1">How do I upload a resource?</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Sign in with your Google account, then click the &quot;Upload Resource&quot; button on the main page.
+                                        Fill in the details and upload your PDF or DOCX file (max 10MB).
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-800 mb-1">How do I earn points?</h3>
+                                    <p className="text-sm text-slate-600">
+                                        You earn 50 points for every resource you upload. Additional points are earned when
+                                        other users like your resources or when you fulfill community requests.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-800 mb-1">Can I request specific resources?</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Yes! Use the &quot;Requests&quot; tab to post a request for specific materials. Other students
+                                        can see your request and upload the resources you need.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-800 mb-1">How do I report inappropriate content?</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Email us at <strong>codez.ai.contact@gmail.com</strong> with the resource title and
+                                        description of the issue. We&apos;ll review and take action within 24 hours.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-800 mb-1">Is SaveethaBase free?</h3>
+                                    <p className="text-sm text-slate-600">
+                                        Yes, SaveethaBase is completely free. We are supported by advertisements to
+                                        cover hosting and infrastructure costs.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-lg p-8">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-6">Send Us a Message</h2>
-
-                    {submitted && (
-                        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-                            Thank you for contacting us! We'll get back to you soon.
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                placeholder="Your name"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-                            <input
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                placeholder="your.email@example.com"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Subject</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.subject}
-                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                placeholder="What's this about?"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">Message</label>
-                            <textarea
-                                required
-                                value={formData.message}
-                                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                rows="6"
-                                className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                placeholder="Tell us more..."
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition"
-                        >
-                            Send Message
-                        </button>
-                    </form>
+                {/* Content Removal */}
+                <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 mt-8">
+                    <h2 className="text-xl font-bold text-slate-800 mb-3">Content Removal Requests</h2>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                        If you are a faculty member or content owner and believe that your copyrighted material has been uploaded
+                        to SaveethaBase without permission, please email us at <strong>codez.ai.contact@gmail.com</strong> with
+                        the following information: your name and affiliation, the specific resource URL or title, proof of ownership,
+                        and your preferred action. We will review and process your request within 48 hours.
+                    </p>
                 </div>
-            </div>
+            </main>
+
+            <footer className="bg-slate-900 text-white py-8 mt-12">
+                <div className="max-w-4xl mx-auto px-6 text-center text-slate-400 text-sm">
+                    <div className="flex justify-center gap-6 mb-4">
+                        <Link href="/about" className="hover:text-white transition-colors">About</Link>
+                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+                        <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+                        <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+                    </div>
+                    <p>&copy; {new Date().getFullYear()} SaveethaBase. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
-    )
+    );
 }
